@@ -1,93 +1,110 @@
-# GoingBalls_android
+# AeroSphere 3D (Going Balls) — Android Native Edition
 
+A premium, bright, kid-friendly 3D rolling ball platformer developed natively for Android with **100% Zero-Ads** compliance, custom 60Hz arcade physics, Filament PBR 3D viewport, comprehensive 40-level progression, and dynamic sound effects.
 
+---
 
-## Getting started
+## 🌟 Key Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### 1. 40 Deterministic Hand-Crafted Levels
+- **Tier 1 — Easy (Levels 1–10):** Gentle straightaways, wide turns, introductory star cubes, and gentle speed boosts.
+- **Tier 2 — Normal (Levels 11–20):** S-curves, banked ramps, moving hazards, and split paths.
+- **Tier 3 — Hard (Levels 21–30):** Narrow planks, rail-less cliff edges, alternating ramp jumps, and dense obstacle clusters.
+- **Tier 4 — Expert (Levels 31–40):** Precision gaps, moving platforms, high-speed slaloms, and tight finish runs.
+- **Level Select Grid Modal:** Full 40-level selector with tier filter chips (`ALL`, `EASY`, `NORM`, `HARD`, `EXP`), best score tracking, and instant level jump.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### 2. Bright, Kid-Friendly Visual Aesthetics
+- **Sky & Atmosphere:** Sunny blue gradient sky with animated fluffy white clouds and lush green rolling hills.
+- **Track & Rails:** Honey birch wooden planks with candy-cane red & white safety guide rails and glowing finish archways.
+- **Player Ball:** High-gloss cyan & coral swirl rolling sphere with realistic lighting, specular highlights, and rolling animation.
+- **Destructible Obstacles:** Golden star collectible crates and smashable barrier cubes.
 
-## Add your files
+### 3. Dual-Viewport Rendering Architecture
+- **Filament PBR Viewport (`FilamentSphereViewport`):** Powered by Google Filament 1.51.0 PBR engine rendering realistic physical materials, glTF 2.0 models (`sphere.glb`), directional sunlight, and IBL spherical harmonics.
+- **Canvas PBR Fallback (`PBRSphereViewport`):** Lightweight, 60 FPS software fallback viewport ensuring universal device compatibility across any Android hardware.
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+### 4. 60Hz Arcade Physics Engine
+- **Fixed Sub-stepping:** Deterministic 60Hz update loop ($\Delta t = 1/60\text{ s}$).
+- **World Gravity:** Authentic arcade feel tuned to $19.620\text{ m/s}^2$ ($2.0g$).
+- **Destructible Star Cubes (TC6):** Precision smashing threshold ($13.5\text{ m/s}$) with $71.19\%$ kinetic energy retention.
+- **Intuitive Touch Controls:** Fluid swipe & drag ball steering with responsive velocity damping and momentum.
+
+### 5. Rich Audio & Sound Effects Engine (`GameAudioManager`)
+- **Cheerful BGM:** Looping melodic background soundtrack (`bgm_gameplay.wav`).
+- **Real-Time SFX:** Dynamic rolling pitch/volume, button clicks (`sfx_button.wav`), checkpoints (`sfx_checkpoint.wav`), coin pickups (`sfx_coin.wav`), key unlocks (`sfx_key.wav`), extra lives (`sfx_life.wav`), obstacle smashes (`sfx_smash.wav`), and plinko pegs (`sfx_plinko_peg.wav`).
+- **Victory Fanfare:** Celebration jingle upon crossing the checkered finish line (`sfx_victory_fanfare.wav`).
+- **Audio Toggle:** One-tap mute/unmute control in the HUD.
+
+### 6. Post-Level Plinko Carnival Minigame (`PlinkoMinigameView`)
+- Interactive pegboard minigame where players drop their ball through bouncy pins to win coin multipliers ($2\times$, $3\times$, $5\times$, $10\times$).
+
+### 7. 100% Zero-Ads & Privacy-First
+- **No Ad SDKs:** Zero Google AdMob, Unity Ads, AppLovin, or third-party ad networks.
+- **No Tracking or Spyware:** No telemetry, tracking permissions, or user profiling.
+- **Kid-Safe & Offline:** Fully playable without an internet connection.
+
+---
+
+## 🏗️ Project Architecture
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/sondeptrai/goingballs_android.git
-git branch -M main
-git push -uf origin main
+android/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── kotlin/com/aerosphere3d/game/
+│   │   │   │   ├── MainActivity.kt               # Lifecycle & Compose root
+│   │   │   │   ├── audio/
+│   │   │   │   │   └── GameAudioManager.kt       # SoundPool & MediaPlayer audio engine
+│   │   │   │   └── ui/
+│   │   │   │       ├── FilamentSphereViewport.kt # Filament 1.51.0 3D PBR renderer
+│   │   │   │       ├── PBRSphereViewport.kt      # 60 FPS fallback canvas renderer
+│   │   │   │       ├── GamePlayScreen.kt         # Compose Game UI, HUD & 40-Level Grid
+│   │   │   │       ├── PlinkoMinigameView.kt     # Plinko carnival minigame
+│   │   │   │       └── theme/Theme.kt            # Kid-friendly vibrant design theme
+│   │   │   ├── assets/models/
+│   │   │   │   └── sphere.glb                    # glTF 2.0 PBR Ball Model
+│   │   │   └── res/raw/                          # 9 Audio files (BGM & SFX WAV)
+│   │   └── AndroidManifest.xml
+│   └── build.gradle.kts
+├── core/
+│   ├── aerophysics/
+│   │   ├── src/main/kotlin/com/aerosphere3d/core/aerophysics/
+│   │   │   ├── AeroPhysicsEngine.kt              # Core physics stepping & integration
+│   │   │   ├── GameplayEngine.kt                 # 60Hz 2.0g Arcade Physics
+│   │   │   ├── LevelCourseBuilder.kt             # 40 deterministic track layouts
+│   │   │   ├── SurfaceGeometry.kt                # Splines, ramps & collision hulls
+│   │   │   ├── SweptSphereCCD.kt                 # Continuous collision detection
+│   │   │   └── TrackCourse.kt                    # Course segment specifications
+│   │   └── src/test/kotlin/                      # TC1-TC8 Physics spec unit tests
+│   └── pal/                                      # Physics Abstraction Layer (Vector3D, Quaternion)
+├── gradle/wrapper/
+├── build.gradle.kts
+└── settings.gradle.kts
 ```
 
-## Integrate with your tools
+---
 
-* [Set up project integrations](https://gitlab.com/sondeptrai/goingballs_android/-/settings/integrations)
+## 🚀 Building & Running
 
-## Collaborate with your team
+### Prerequisites
+- Android Studio Hedgehog (2023.1.1) or later
+- JDK 17
+- Android SDK 34 (compileSdk 34, minSdk 26)
+- Physical device or Android Emulator with OpenGL ES 3.0+ support
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Build via Gradle
+```bash
+# Debug Build
+./gradlew assembleDebug
 
-## Test and Deploy
+# Install on connected device
+./gradlew installDebug
+```
 
-Use the built-in continuous integration in GitLab.
+---
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## 🔒 Verification & Compliance
+- **Physical Device Runtime Verification:** Verified on Android hardware (OpenGL ES 3.2, 60 FPS sustained).
+- **Ad Check:** Zero ad dependencies, zero network ad calls, zero ad view components.
+- **Dual Parity:** Fully matched with iOS counterpart repository (`goingballs_ios`).
